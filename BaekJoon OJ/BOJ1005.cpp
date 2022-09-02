@@ -48,8 +48,18 @@ int main() {
 		
 		bool allVisit;
 		while (true) {
+			allVisit = true;
 			for (int i=1; i<=n; i++) {
-				if (input[i] == 0) {
+				if (visited[i] == 0) {
+					allVisit=false;
+					break;
+				}
+			}
+			
+			if (allVisit) break;
+			
+			for (int i=1; i<=n; i++) {
+				if (input[i] == 0 && visited[i] != 1) {
 					goingVisit.push_front(i);
 				}
 			}
@@ -72,11 +82,12 @@ int main() {
 					rule[cur].pop_back();
 					input[pushIn]--;
 				}
+				visited[cur] = 1;
 				goingVisit.pop_back();
 			}
 		}
 		
-		printf("%d\n", &min[W]);
+		printf("%d\n", min[W]);
 		
 		
 	}
