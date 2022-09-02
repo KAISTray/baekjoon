@@ -1,85 +1,83 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <vector>
 #include <deque>
+#include <stdlib.h>
+
 
 using namespace std;
 
 int main() {
-	int T;
-	int t, i, j; //iter var. t for testcase Iter
-	scanf("%d", &T);	
-	
+	int T,t;
+	scanf("%d", &T);
 	
 	for (t=0; t<T; t++) {
 		int n,k;
 		scanf("%d %d", &n, &k);
 		
-		int d[n+1]; //time to build
+		vector<int> d; //time req
+		d.push_back(0);
 		
-		for (i=1; i<=n; i++) {
-			scanf("%d", &d[i]);
+		for (int i=0; i<n; i++) {
+			int delay;
+			scanf("%d", &delay);
+			d.push_back(delay);
 		}
 		
-		vector<vector<int> > a(n+1);
-		int init, end;
+		vector<vector<int> >rule(n+1), ruleInv(n+1); //rules
+		vector<int> input(n+1); //input dimensions. the node where input dim is 0 will be the 1st.
+		input[0] = -1;
 		
-		for (i=0; i<k; i++) {
-			scanf("%d %d", &init, &end);
-			a[end].push_back(init); //역방향 그래프 : W번째 정점이 중심이되는..! 
+		//always node 0 must be NULL
+		
+		
+		for (int i=0; i<k; i++) {
+			int init, fin;
+			scanf("%d %d", &init, &fin);
+			rule[init].push_back(fin);
+			ruleInv[fin].push_back(init);
+			input[fin]++;
 		}
 		
-		vector<int> min(n), visited(n);	
-		deque<int> valid; //유효한 끝노드 인덱스들 
-		deque<int> visit; //방문할 덱들 
+		vector<int> min(n+1);
 		
-		int W, now, cur;
+		int W;
 		scanf("%d", &W);
 		
-		visit.push_front(W);
+		deque<int> goingVisit;
+		vector<int> visited(n+1);
 		
-		while(!visit.empty()) { //순회버스 출발
-		// 정점 W에서 시작해서 주변 하나씩 탐색하기 
-			
-			now = visit.back();
-			visit.pop_back();
-			
-			if (visited[now] == 1) {
-				continue;
-			}
-			
-			//visit_pop_back을 뽑아옴
-			//그 근처에 애들 다 순회함
-			if (a[now].empty()) {
-				valid.push_back(now);
-			}
-			
-			while(!a[now].empty()) {
-				cur = a[now].back();
-				a[now].pop_back();
-				
-				if (min[cur] == 0 || min[cur] < min[now] + d[cur]) {
-					min[cur] = min[now] + d[cur];
-				}
-				
-				if (visited[now] != 1) {
-					visit.push_front(cur);
+		bool allVisit;
+		while (true) {
+			for (int i=1; i<=n; i++) {
+				if (input[i] == 0) {
+					goingVisit.push_front(i);
 				}
 			}
-			visited[now] = 1;
-		}
-		
-		int Ans = -1;
-		
-		
-		while(!valid.empty()) {
-			cur = valid.back();
-			valid.pop_back();
-			if (Ans == -1 || Ans > min[cur]) {
-				Ans = min[cur];
+			while(!goingVisit.empty()) {
+				int cur = goingVisit.back();
+				
+				int max = 0;
+				while (!ruleInv[cur].empty()) {
+					int nowPt;
+					nowPt = ruleInv[cur].back();
+					ruleInv[cur].pop_back();
+					if (min[nowPt] > max) {
+						max = min[nowPt];
+					}
+				}
+				min[cur] = max + d[cur];
+				while (!rule[cur].empty()) {
+					int pushIn;
+					pushIn = rule[cur].back();
+					rule[cur].pop_back();
+					input[pushIn]--;
+				}
+				goingVisit.pop_back();
 			}
 		}
 		
-		printf("%d\n", Ans);
+		printf("%d\n", &min[W]);
+		
+		
 	}
 }
