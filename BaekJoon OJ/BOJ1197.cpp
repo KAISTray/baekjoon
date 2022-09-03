@@ -13,8 +13,8 @@ int main() {
 	vector<tuple<int, int, int> > edge;
 	
 	for (int i=0; i<e; i++) {
-		int i,f,d;
-		scanf("%d %d %d", &i, &f, &d);
+		int init,fin,d;
+		scanf("%d %d %d", &init, &fin, &d);
 		
 	}
 }
